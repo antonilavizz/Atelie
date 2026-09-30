@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ateliê • Pedidos</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#faf6f1;--card:#fff;--tx:#2b2320;--mu:#8a7c72;--ac:#b5533c;--ok:#3f8f5a;--wa:#c98a1b;--bd:#eadfd5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1816;--card:#2a2421;--tx:#f3ebe4;--mu:#a3958a;--ac:#e07a5f;--ok:#6cc48a;--wa:#e5b04a;--bd:#3a322e}}
+:root[data-theme="dark"]{--bg:#1c1816;--card:#2a2421;--tx:#f3ebe4;--mu:#a3958a;--ac:#e07a5f;--ok:#6cc48a;--wa:#e5b04a;--bd:#3a322e}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:16px 16px 96px;max-width:560px;margin:0 auto}
+h1{font-size:22px;margin:4px 0 12px}
+.sum{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.sum div{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px}
+.sum small{color:var(--mu);font-size:11px;display:block}
+.sum b{font-size:16px}
+.tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto}
+.tabs button{border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:20px;padding:7px 14px;font-size:14px;white-space:nowrap}
+.tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.o{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:10px}
+.o .t{display:flex;justify-content:space-between;gap:8px}
+.o .c{font-weight:600}
+.o .p{color:var(--mu);font-size:14px;margin:2px 0 8px}
+.tag{font-size:12px;border-radius:10px;padding:2px 8px;border:1px solid currentColor}
+.Pendente{color:var(--wa)}.Pronto{color:var(--ac)}.Entregue{color:var(--ok)}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--mu)}
+.acts{display:flex;gap:6px;margin-top:10px}
+.acts button{flex:1;border:1px solid var(--bd);background:transparent;color:var(--tx);border-radius:10px;padding:8px;font-size:13px}
+.late{color:#d64545;font-weight:600}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ac);color:#fff;border:0;border-radius:28px;padding:14px 20px;font-size:16px;font-weight:600;box-shadow:0 4px 14px #0004}
+.ov{position:fixed;inset:0;background:#0007;display:none;align-items:flex-end;justify-content:center;z-index:9}
+.ov.on{display:flex}
+.f{background:var(--bg);width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));max-height:90%;overflow:auto}
+.f label{display:block;font-size:13px;color:var(--mu);margin:10px 0 4px}
+.f input,.f select{width:100%;padding:11px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font-size:16px}
+.f .b{display:flex;gap:8px;margin-top:16px}
+.f .b button{flex:1;padding:13px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font-size:16px}
+.f .b .s{background:var(--ac);color:#fff;border-color:var(--ac)}
+.em{text-align:center;color:var(--mu);padding:40px 0}
+.itens{display:flex;flex-direction:column;gap:8px}
+.item{display:flex;gap:6px;align-items:center}
+.item input{flex:1}
+.item input.pr{max-width:100px}
+.item button{flex:none;width:38px;padding:0;border:1px solid var(--bd);background:var(--card);color:var(--mu);border-radius:10px;font-size:18px}
+.addit{margin-top:8px;padding:10px;border:1px dashed var(--bd);background:transparent;color:var(--ac);border-radius:10px;width:100%;font-size:14px}
+.tot{text-align:right;font-size:13px;color:var(--mu);margin-top:8px}
+.svc{font-size:12px;color:var(--mu);margin-left:6px}
+</style>
+</head>
+<body>
+<h1>🧵 Pedidos do ateliê</h1>
+<div class="sum">
+<div><small>A receber</small><b id="s1">R$ 0</b></div>
+<div><small>Em aberto</small><b id="s2">0</b></div>
+<div><small>Recebido no mês</small><b id="s3">R$ 0</b></div>
+</div>
+<div class="tabs" id="tabs"></div>
+<div id="list"></div>
+<button class="fab" onclick="openF()">+ Novo pedido</button>
+
+<div class="ov" id="ov"><div class="f">
+<h2 id="ft" style="margin:0">Novo pedido</h2>
+<label>Cliente</label><input id="cl" placeholder="Nome">
+<label>Telefone (opcional)</label><input id="ph" type="tel" placeholder="(47) 99999-9999">
+<label>Serviços</label>
+<div class="itens" id="itens"></div>
+<button type="button" class="addit" onclick="addItem()">+ Adicionar serviço</button>
+<div class="tot" id="tot">Total: R$ 0</div>
+<label>Prazo</label><input id="dl" type="date">
+<div class="b"><button onclick="closeF()">Cancelar</button><button class="s" onclick="save()">Salvar</button></div>
+</div></div>
+
+<script>
+var K="ateliePedidos",data=[],filt="Pendente",edit=null,formItens=[];
+try{data=JSON.parse(localStorage.getItem(K)||"[]")}catch(e){data=[]}
+data.forEach(function(o){if(!o.itens){o.itens=[{desc:o.pc||"Serviço",pr:o.pr||0}]}});
+function persist(){try{localStorage.setItem(K,JSON.stringify(data))}catch(e){}}
+function total(o){return (o.itens||[]).reduce(function(a,it){return a+(it.pr||0)},0)}
+function $(i){return document.getElementById(i)}
+function money(n){return "R$ "+(n||0).toLocaleString("pt-BR",{minimumFractionDigits:0,maximumFractionDigits:2})}
+function fd(s){if(!s)return"sem prazo";var p=s.split("-");return p[2]+"/"+p[1]}
+function today(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function render(){
+ var open=data.filter(function(o){return o.st!=="Entregue"||!o.paid});
+ $("s1").textContent=money(data.filter(function(o){return !o.paid}).reduce(function(a,o){return a+total(o)},0));
+ $("s2").textContent=data.filter(function(o){return o.st!=="Entregue"}).length;
+ var m=today().slice(0,7);
+ $("s3").textContent=money(data.filter(function(o){return o.paid&&(o.pd||"").slice(0,7)===m}).reduce(function(a,o){return a+total(o)},0));
+ var T=["Pendente","Pronto","Entregue","Todos"];
+ $("tabs").innerHTML=T.map(function(t){return '<button class="'+(t===filt?"on":"")+'" onclick="setF(\''+t+'\')">'+t+'</button>'}).join("");
+ var L=data.filter(function(o){return filt==="Todos"||o.st===filt});
+ L.sort(function(a,b){return (a.dl||"9999").localeCompare(b.dl||"9999")});
+ $("list").innerHTML=L.length?L.map(card).join(""):'<div class="em">Nenhum pedido aqui.</div>';
+}
+function card(o){
+ var late=o.dl&&o.dl<today()&&o.st!=="Entregue";
+ var next=o.st==="Pendente"?["Pronto","Marcar pronto"]:o.st==="Pronto"?["Entregue","Marcar entregue"]:null;
+ var itensHtml=(o.itens||[]).map(function(it){return '<div>'+esc(it.desc)+'<span class="svc">'+money(it.pr)+'</span></div>'}).join("");
+ return '<div class="o"><div class="t"><span class="c">'+esc(o.cl)+'</span><span class="tag '+o.st+'">'+o.st+'</span></div>'+
+ '<div class="p">'+itensHtml+'</div><div class="row"><span><b>'+money(total(o))+'</b></span><span>•</span><span class="'+(late?"late":"")+'">Prazo: '+fd(o.dl)+(late?" (atrasado)":"")+'</span><span>•</span><span>'+(o.paid?"✅ Pago":"⏳ Não pago")+'</span></div>'+
+ '<div class="acts">'+(next?'<button onclick="adv('+o.id+',\''+next[0]+'\')">'+next[1]+'</button>':'')+
+ '<button onclick="pay('+o.id+')">'+(o.paid?"Desfazer pgto":"Marcar pago")+'</button>'+
+ (o.ph?'<button onclick="location.href=\'https://wa.me/55'+o.ph.replace(/\D/g,"")+'\'">WhatsApp</button>':'')+
+ '<button onclick="openF('+o.id+')">Editar</button></div></div>';
+}
+function esc(s){return String(s||"").replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function setF(t){filt=t;render()}
+function find(id){return data.filter(function(o){return o.id===id})[0]}
+function adv(id,s){find(id).st=s;persist();render()}
+function pay(id){var o=find(id);o.paid=!o.paid;o.pd=o.paid?today():"";persist();render()}
+function renderItens(){
+ $("itens").innerHTML=formItens.map(function(it,i){
+  return '<div class="item"><input placeholder="Serviço, ex: Calça - barra" value="'+esc(it.desc)+'" oninput="updItem('+i+',\'desc\',this.value)">'+
+  '<input class="pr" type="number" inputmode="decimal" placeholder="R$" value="'+(it.pr||"")+'" oninput="updItem('+i+',\'pr\',this.value)">'+
+  (formItens.length>1?'<button type="button" onclick="rmItem('+i+')">×</button>':'')+
+  '</div>';
+ }).join("");
+ var t=formItens.reduce(function(a,it){return a+(parseFloat(it.pr)||0)},0);
+ $("tot").textContent="Total: "+money(t);
+}
+function addItem(){formItens.push({desc:"",pr:""});renderItens()}
+function rmItem(i){formItens.splice(i,1);renderItens()}
+function updItem(i,k,v){
+ formItens[i][k]=v;
+ var t=formItens.reduce(function(a,it){return a+(parseFloat(it.pr)||0)},0);
+ $("tot").textContent="Total: "+money(t);
+}
+function openF(id){
+ edit=id||null;var o=id?find(id):{};
+ $("ft").textContent=id?"Editar pedido":"Novo pedido";
+ $("cl").value=o.cl||"";$("ph").value=o.ph||"";$("dl").value=o.dl||"";
+ formItens=o.itens?JSON.parse(JSON.stringify(o.itens)):[{desc:"",pr:""}];
+ renderItens();
+ $("ov").classList.add("on");
+}
+function closeF(){$("ov").classList.remove("on")}
+function save(){
+ var cl=$("cl").value.trim();
+ var itens=formItens.map(function(it){return {desc:(it.desc||"").trim(),pr:parseFloat(it.pr)||0}}).filter(function(it){return it.desc});
+ if(!cl||!itens.length){alert("Preencha cliente e ao menos um serviço.");return}
+ var v={cl:cl,ph:$("ph").value.trim(),itens:itens,dl:$("dl").value};
+ if(edit){var o=find(edit);for(var k in v)o[k]=v[k]}
+ else{v.id=Date.now();v.st="Pendente";v.paid=false;v.pd="";data.push(v)}
+ persist();closeF();render();
+}
+render();
+</script>
+</body>
+</html>
